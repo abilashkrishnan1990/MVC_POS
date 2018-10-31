@@ -1,0 +1,20 @@
+<?php
+
+class Dbcon{
+   //public $db;
+   public function __construct(){
+      $this->db = new mysqli('p:localhost', 'root','','terrific_minds');
+         if(! $this->db ) {
+            die('Could not connect: ' . mysqli_error());
+         }
+         else{
+            echo 'Connected successfully';
+         }
+         return $this->db;
+   }
+   
+   
+}
+
+
+?>
