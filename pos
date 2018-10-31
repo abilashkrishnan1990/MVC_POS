@@ -1,0 +1,117 @@
+<html>
+<head>
+<style>
+#total{
+	margin-left:10cm;
+}
+</style>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<body>
+	<table border="1" id="mytable">
+		<tr>
+			<td>
+				Item Name
+			</td>
+			<td>
+				Quantity
+			</td>
+			<td>
+				Price
+			</td>
+			<td>
+				Tax
+			</td>
+			<td>
+				Amount
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<select name="pname" id="pname">
+				<option value="id1">book</option>
+				<option value="id2">music cd</option>
+				<option value="id3">choclate</option>
+				</select>
+			</td>
+			<td>
+				<input type="text" name="" value="" id="quantity"/>
+			</td>
+			<td>
+				<input type="text" name="" value="" id="price"/>
+			</td>
+			<td>
+				<input type="text" name="" value="" id="tax"/>
+			</td>
+			<td>
+				<input type="text" name="" value="" id="amount"/>
+			</td>
+		</tr>
+	</table>
+	<input type="button" name="" id="addnew" value="additem"/>
+	<div id="total" class="row" >
+	<div class="col-md-4" >Toat Tax :<div  span id="gtax"></div></div>
+	<div class="col-md-4" >Total Amount : <div span id="gtot"></div>
+	</div>
+</body>
+</head>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script>
+$("#addnew").click(function () {
+	$("#mytable").each(function () {
+		var tds = '<tr>';
+		jQuery.each($('tr:last td', this), function () {
+			tds += '<td>' + $(this).html() + '</td>';
+		});
+		tds += '</tr>';
+		if ($('tbody', this).length > 0) {
+			$('tbody', this).append(tds);
+		} else {
+			$(this).append(tds);
+		}
+	});
+});
+$('#mytable').on('keyup', '#price', function() {
+	var itm_val = $(this).closest("tr").find("#pname").val();
+	var tax_val = {id1:10, id2:5, id3:10};
+	var price   = $(this).closest("tr").find('#price').val();
+	var tax = tax_val[itm_val];
+	var tax_per = price * (tax/100);
+	var itm_qty = $(this).closest("tr").find('#quantity').val();
+	$(this).closest("tr").find('#tax').val(tax_per);
+	var price   = $(this).closest("tr").find('#price').val();
+	var amount  = itm_qty * price;
+	$(this).closest("tr").find('#amount').val(amount);
+	calucalate_sum();
+	
+});
+function calucalate_sum(){
+var calculated_total_sum = 0;
+var calculated_total_tax = 0;
+	$("#mytable #amount").each(function () {
+	   var get_textbox_value = $(this).val();
+	   if ($.isNumeric(get_textbox_value)) {
+		  calculated_total_sum += parseFloat(get_textbox_value);
+		  }                  
+	});
+	$("#mytable #tax").each(function () {
+	   var get_textbox_value = $(this).val();
+	   if ($.isNumeric(get_textbox_value)) {
+		  calculated_total_tax += parseFloat(get_textbox_value);
+		  }                  
+	});
+		if(calculated_total_sum > 0){
+		//alert(calculated_total_tax);
+			$('#calc').show();
+			$("#gtot").html(calculated_total_sum);
+			$("#gtax").html(calculated_total_tax);
+		}
+	}
+	
+</script>
+</html>
