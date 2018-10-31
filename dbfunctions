@@ -1,0 +1,41 @@
+<?php
+require('dbcon.php');
+class Dbfunctions extends Dbcon{
+	public function Login(){
+	  $sql="select * from tbl_register where username='demo' and password='81dc9bdb52d04dc20036dbd8313ed055'";
+      $query=mysqli_query($this->db,$sql);
+      $row=mysqli_num_rows($query);
+      if($row > 0){
+         echo "sucess";
+      }
+      else{
+         echo "fails".mysqli_error($this->db);
+      }
+	} 
+	public function dd(){
+	  $sql="select * from tbl_register where username='demo' and password='81dc9bdb52d04dc20036dbd8313ed055'";
+      $query=mysqli_query($this->db,$sql);
+      $row=mysqli_num_rows($query);
+      if($row > 0){
+         echo "sucess";
+      }
+      else{
+         echo "fails".mysqli_error($this->db);
+      }
+	} 
+   public function neww(){
+      $sql = "select  * from tbl_pos";
+      $query = mysqli_query($this->db,$sql);
+      $row = mysqli_num_rows($query);
+      $arry_result = array();
+      if($row > 0){
+         while($row =mysqli_fetch_array($query)){
+            $result['name'] = $row['name'];
+            $result['value'] = $row['value'];
+            array_push($arry_result,$result);
+         }
+         
+      }
+      return $arry_result;
+   } 
+}
