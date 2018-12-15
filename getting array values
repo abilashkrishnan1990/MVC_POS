@@ -1,0 +1,107 @@
+<?php
+
+//get function in php arrays
+
+//Example 1  controllers
+
+$data['item_details']  = $this->item_model->items_details($parameter1);
+if($data['item_details']==0 || $data['item_details']==false ){
+	show_404();
+}
+$data['p_info']  =  array_column($data['item_details'], 'p_info');
+$data['info']	=	array_column($data['item_details'], 'info');
+
+
+$data['R_info']  =  array_column($data['item_details'], 'R_info');
+//echo'<pre>';print_r($data['R_info']);echo '</pre>';
+//exit;
+$this->load->view('products_details.php',$data);
+
+
+//Emaple 1 Model
+
+function items_details($id){
+	if(empty($id) || !is_numeric($id)){
+		return false;
+	}else{
+	$query = $this->db->query("SELECT * FROM tbl_product_master where product_id='$id'");
+	$items_details  = array();
+	foreach ($query->result_array() as $row)
+	{
+	        $data['p_info']['product_id']  = $row['product_id'];
+	        $data['p_info']['item_name']  = $row['item_name'];
+	        $data['p_info']['price']  = $row['price'];
+	        $data['p_info']['short_desc']  = $row['short_desc'];
+	        $data['p_info']['brief_desc']  = $row['brief_desc'];
+	        $data['p_info']['product_image']  = $row['product_image'];
+	        $data['info']['product_information']  = json_decode($row['product_information']);
+	        $related_product = $row['realted_products'];
+	        if($related_product!=''){
+				$query1 = $this->db->query("SELECT * FROM tbl_product_master where product_id IN ($related_product)");
+				foreach ($query1->result_array() as $row1)
+				{
+			        $dataR['R_info']['product_id']  = $row1['product_id'];
+			        $dataR['R_info']['item_name']  = $row1['item_name'];
+			        $dataR['R_info']['price']  = $row1['price'];
+			        $dataR['R_info']['short_desc']  = $row1['short_desc'];
+			        $dataR['R_info']['brief_desc']  = $row1['brief_desc'];
+			        //$data['R_info']['product_image']  = $row1['product_image'];
+			        //$data['info']['product_information']  = json_decode($row['product_information']);
+			        //$related_product = $row['realted_products'];
+			        array_push($items_details,$dataR);
+				}
+			}
+	        array_push($items_details,$data);
+	        
+	}
+	return $items_details;
+	}
+}
+
+
+//Emaple 2 Controller
+
+function buy($id){
+    // Set variables for paypal form
+    $returnURL = base_url().'paypal/success';
+    $cancelURL = base_url().'paypal/cancel';
+    $notifyURL = base_url().'paypal/ipn';
+    
+    // Get product data from the database
+    $products = $this->product->getproduct($id);
+    
+    // Get current user ID from the session
+    $userID = '10';
+    
+    foreach ($products as $product) {
+        $item_name[] =   $product['name'];
+        $item_number[] = $product['id'];
+        $amount[] = $product['grandtotal'];
+    }  
+    $item_name = implode(',',$item_name);
+    $item_number = implode(',',$item_number);
+    $amount = array_sum($amount);
+    $amount = round($amount);
+    // Add fields to paypal form
+    $this->paypal_lib->add_field('return', $returnURL);
+    $this->paypal_lib->add_field('cancel_return', $cancelURL);
+    $this->paypal_lib->add_field('notify_url', $notifyURL);
+    $this->paypal_lib->add_field('item_name', $item_name);
+    $this->paypal_lib->add_field('custom', $userID);
+    $this->paypal_lib->add_field('item_number',  $item_number);
+    $this->paypal_lib->add_field('amount',  $amount);
+    // Render paypal form
+    $this->paypal_lib->paypal_auto_form();
+
+}
+
+//Empale 2 Model
+
+public function getproduct($id = ''){
+        $sql = "SELECT id,name,price,(qty * price) as price,sum(price) as grandtotal FROM `products` WHERE ses_id ='$id' GROUP BY name";
+        $query = $this->db->query($sql);
+        $result = $query->result_array();
+        // return fetched data
+        return !empty($result)?$result:false;
+}
+?>
